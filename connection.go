@@ -15,7 +15,7 @@ type Connection struct {
 }
 
 func (c *Connection) do(method, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, c.baseurl+url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -23,18 +23,18 @@ func (c *Connection) do(method, url string, body io.Reader) (*http.Response, err
 	return c.conn.Do(req)
 }
 
-func NewConnection(baseurl, username, password string) *Connection {
+func NewConnection(baseurl, username, password string) (*Connection, error) {
 	if !strings.HasSuffix(baseurl, "/") {
 		baseurl += "/"
 	}
 
 	if username == "" || password == "" {
-		panic(errors.New("username and password required to connect to mailman"))
+		return nil, errors.New("username and password required to connect to mailman")
 	}
 
 	return &Connection{
 		baseurl:  baseurl,
 		username: username,
 		password: password,
-	}
+	}, nil
 }
