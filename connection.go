@@ -19,6 +19,7 @@ func (c *Connection) do(method, url string, body io.Reader) (*http.Response, err
 	if err != nil {
 		return nil, err
 	}
+
 	req.SetBasicAuth(c.username, c.password)
 	return c.conn.Do(req)
 }

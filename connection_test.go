@@ -14,12 +14,12 @@ const (
 )
 
 func TestConnectionBasicAuthRejected(t *testing.T) {
-	conn, err := NewConnection(BaseURL, Username, Password)
+	conn, err := NewConnection(BaseURL, "jimmer", Password)
 	if err != nil {
 		t.Errorf("Connection failed to create: %s", err.Error())
 	}
 
-	res, err := conn.do(http.MethodGet, "system/version", bytes.NewBuffer(nil))
+	res, err := conn.do(http.MethodGet, "system/versions", bytes.NewBuffer(nil))
 	if err != nil {
 		t.Errorf("Connection request failed: %s", err.Error())
 	}
