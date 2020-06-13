@@ -1,7 +1,23 @@
 package gomailman
 
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
 type Client struct {
 	conn *Connection
+}
+
+func (c *Client) buildURL(parts ...string) (url string) {
+	url = c.conn.baseurl
+	for _, p := range parts {
+		url += "/" + p
+	}
+
+	return
 }
 
 func NewClient(host, username, password string) (*Client, error) {
@@ -13,4 +29,40 @@ func NewClient(host, username, password string) (*Client, error) {
 	return &Client{
 		conn: conn,
 	}, nil
+}
+
+func (c *Client) GetDomain(domainID string) (*Domain, error) {
+	res, err := c.conn.do(http.MethodGet, c.buildURL("domains", domainID), http.NoBody)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var domain *Domain
+	json.Unmarshal(b, domain)
+
+	err = res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return domain, nil
+}
+
+func (c *Client) AddDomain(domain *Domain) error {
+	b, err := json.Marshal(domain)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.conn.do(http.MethodPost, c.buildURL("domains"), bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
