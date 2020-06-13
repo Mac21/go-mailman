@@ -1,0 +1,13 @@
+prefix: false
+
+services:
+  mailman:
+    image: registry.veracitynetworks.com:5000/mailman:release
+    tty: true
+    detach: true
+    expose:
+      - 8001
+    publish:
+      - 8001:8001
+    env:
+      HYPERKITTY_API_KEY: "changeme"
