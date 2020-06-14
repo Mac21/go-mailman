@@ -12,7 +12,6 @@ func TestClientAddDomain(t *testing.T) {
 	}
 
 	domain := &Domain{
-		AliasDomain: "",
 		Description: "Test Domain",
 		MailHost:    "test@localhost.com",
 	}
