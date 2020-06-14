@@ -11,13 +11,17 @@ type Client struct {
 	conn *Connection
 }
 
-func (c *Client) buildURL(parts ...string) (url string) {
-	url = c.conn.baseurl
-	for _, p := range parts {
-		url += "/" + p
+func (c *Client) buildURL(parts ...string) string {
+	var url string
+	for indx, p := range parts {
+		if indx == 0 {
+			url += p
+		} else {
+			url += "/" + p
+		}
 	}
 
-	return
+	return url
 }
 
 func NewClient(host, username, password string) (*Client, error) {
