@@ -46,8 +46,11 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 		return nil, err
 	}
 
-	var domain *Domain
-	json.Unmarshal(b, domain)
+	domain := new(Domain)
+	err = json.Unmarshal(b, domain)
+	if err != nil {
+		return nil, err
+	}
 
 	err = res.Body.Close()
 	if err != nil {
