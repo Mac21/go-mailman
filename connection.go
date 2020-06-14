@@ -9,24 +9,28 @@ import (
 
 type Connection struct {
 	conn     http.Client
-	baseurl  string
+	baseURL  string
 	username string
 	password string
 }
 
 func (c *Connection) do(method, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, c.baseurl+url, body)
+	req, err := http.NewRequest(method, c.baseURL+url, body)
 	if err != nil {
 		return nil, err
+	}
+
+	if req.ContentLength > 0 {
+		req.Header.Add("Content-Type", "application/json")
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	return c.conn.Do(req)
 }
 
-func NewConnection(baseurl, username, password string) (*Connection, error) {
-	if !strings.HasSuffix(baseurl, "/") {
-		baseurl += "/"
+func NewConnection(baseURL, username, password string) (*Connection, error) {
+	if !strings.HasSuffix(baseURL, "/") {
+		baseURL += "/"
 	}
 
 	if username == "" || password == "" {
@@ -34,7 +38,7 @@ func NewConnection(baseurl, username, password string) (*Connection, error) {
 	}
 
 	return &Connection{
-		baseurl:  baseurl,
+		baseURL:  baseURL,
 		username: username,
 		password: password,
 	}, nil
