@@ -66,7 +66,7 @@ func TestClientDeleteDomain(t *testing.T) {
 	domain, err := c.GetDomain(domainID)
 	if err != nil {
 		e := err.Error()
-		if !strings.Contains(e, "Domain does not exist") {
+		if !strings.Contains(e, ErrorDomainGet) {
 			t.Error(e)
 		}
 	}
