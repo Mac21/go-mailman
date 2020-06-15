@@ -49,7 +49,7 @@ func TestConnectionNilPassword(t *testing.T) {
 }
 
 func TestConnectionNilUsernamePassword(t *testing.T) {
-	_, err := NewConnection(BaseURL, "", "")
+	_, err := NewConnection(baseURL, "", "")
 	if err == nil {
 		t.Error("Connection successfully created with blank username and password")
 	}
