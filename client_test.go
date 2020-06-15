@@ -1,6 +1,7 @@
 package gomailman
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -48,5 +49,29 @@ func TestClientGetDomain(t *testing.T) {
 
 	if domain.Description != domainDescription {
 		t.Errorf("Unexpected domain Description got %s expected %s", domain.Description, domainDescription)
+	}
+}
+
+func TestClientDeleteDomain(t *testing.T) {
+	c, err := NewClient(baseURL, username, password)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	err = c.DeleteDomain(domainID)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	domain, err := c.GetDomain(domainID)
+	if err != nil {
+		e := err.Error()
+		if !strings.Contains(e, "Domain does not exist") {
+			t.Error(e)
+		}
+	}
+
+	if domain != nil {
+		t.Error("Got non nil domain after delete")
 	}
 }

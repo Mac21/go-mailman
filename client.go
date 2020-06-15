@@ -3,6 +3,7 @@ package gomailman
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -41,6 +42,10 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 		return nil, err
 	}
 
+	if res.StatusCode/100 != 2 {
+		return nil, errors.New("Domain does not exist")
+	}
+
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -52,12 +57,7 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 		return nil, err
 	}
 
-	err = res.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	return domain, nil
+	return domain, res.Body.Close()
 }
 
 func (c *Client) AddDomain(domain *Domain) error {
@@ -66,10 +66,27 @@ func (c *Client) AddDomain(domain *Domain) error {
 		return err
 	}
 
-	_, err = c.conn.do(http.MethodPost, c.buildURL("domains"), bytes.NewReader(b))
+	res, err = c.conn.do(http.MethodPost, c.buildURL("domains"), bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
 
-	return nil
+	if res.StatusCode/100 != 2 {
+		return errors.New("Failed to create domain")
+	}
+
+	return res.Body.Close()
+}
+
+func (c *Client) DeleteDomain(domainID string) error {
+	res, err := c.conn.do(http.MethodDelete, c.buildURL("domains", domainID), http.NoBody)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode/100 != 2 {
+		return errors.New("Failed to delete domain")
+	}
+
+	return res.Body.Close()
 }
