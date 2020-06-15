@@ -43,7 +43,7 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 	}
 
 	if res.StatusCode/100 != 2 {
-		return nil, errors.New("Domain does not exist")
+		return nil, errors.New("Error loading domain: " + res.Status)
 	}
 
 	b, err := ioutil.ReadAll(res.Body)
@@ -61,18 +61,22 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 }
 
 func (c *Client) AddDomain(domain *Domain) error {
+	if domain == nil {
+		return errors.New("Error adding nil domain")
+	}
+
 	b, err := json.Marshal(domain)
 	if err != nil {
 		return err
 	}
 
-	res, err = c.conn.do(http.MethodPost, c.buildURL("domains"), bytes.NewReader(b))
+	res, err := c.conn.do(http.MethodPost, c.buildURL("domains"), bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
 
 	if res.StatusCode/100 != 2 {
-		return errors.New("Failed to create domain")
+		return errors.New("Error adding domain: " + res.Status)
 	}
 
 	return res.Body.Close()
@@ -85,7 +89,7 @@ func (c *Client) DeleteDomain(domainID string) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		return errors.New("Failed to delete domain")
+		return errors.New("Error deleting domain: " + res.Status)
 	}
 
 	return res.Body.Close()
