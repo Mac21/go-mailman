@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	BaseURL  = "http://localhost:8001/3.1"
-	Username = "restadmin"
-	Password = "restpass"
+	baseURL  = "http://localhost:8001/3.1"
+	username = "restadmin"
+	password = "restpass"
 )
 
 func TestConnectionBasicAuthRejected(t *testing.T) {
-	conn, err := NewConnection(BaseURL, "jimmer", Password)
+	conn, err := NewConnection(baseURL, "jimmer", password)
 	if err != nil {
 		t.Errorf("Connection failed to create: %s", err.Error())
 	}
@@ -35,14 +35,14 @@ func TestConnectionBasicAuthRejected(t *testing.T) {
 }
 
 func TestConnectionNilUsername(t *testing.T) {
-	_, err := NewConnection(BaseURL, "", Password)
+	_, err := NewConnection(baseURL, "", password)
 	if err == nil {
 		t.Error("Connection successfully created with blank username")
 	}
 }
 
 func TestConnectionNilPassword(t *testing.T) {
-	_, err := NewConnection(BaseURL, Username, "")
+	_, err := NewConnection(baseURL, username, "")
 	if err == nil {
 		t.Error("Connection successfully created with blank password")
 	}

@@ -11,7 +11,7 @@ const (
 )
 
 func TestClientAddDomain(t *testing.T) {
-	c, err := NewClient(BaseURL, Username, Password)
+	c, err := NewClient(baseURL, username, password)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -28,7 +28,7 @@ func TestClientAddDomain(t *testing.T) {
 }
 
 func TestClientGetDomain(t *testing.T) {
-	c, err := NewClient(BaseURL, Username, Password)
+	c, err := NewClient(baseURL, username, password)
 	if err != nil {
 		t.Error(err.Error())
 	}
