@@ -9,10 +9,13 @@ import (
 	"net/http"
 )
 
-const (
-	ErrorDomainGet    = "Error getting domain"
-	ErrorDomainDelete = "Error deleting domain"
-	ErrorDomainAdd    = "Error adding domain"
+var (
+	// ErrorDomainGet is returned in GetDomain and GetAllDomains by any non 200 response
+	ErrorDomainGet = errors.New("go-mailman: Error getting domain")
+	// ErrorDomainDelete is returned by DeleteDomain by any non 200 respose
+	ErrorDomainDelete = errors.New("go-mailman: Error deleting domain")
+	// ErrorDomainAdd is returned by AddDomain when any non 200 respose
+	ErrorDomainAdd = errors.New("go-mailman: Error adding domain")
 )
 
 type Domain struct {
@@ -21,23 +24,23 @@ type Domain struct {
 	MailHost    string `json:"mail_host"`
 }
 
-func (d Domain) String() string {
-	return fmt.Sprintf("%#v", d)
-}
-
 func (c *Client) GetDomain(domainID string) (*Domain, error) {
 	res, err := c.conn.do(http.MethodGet, c.buildURL("domains", domainID), http.NoBody)
 	if err != nil {
 		return nil, err
 	}
 
-	if res.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("%s: %s", ErrorDomainGet, res.Status)
-	}
-
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode/100 != 2 {
+		re := &RequestError{}
+		if err := json.Unmarshal(b, re); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%s %s", ErrorDomainGet, re)
 	}
 
 	domain := new(Domain)
@@ -55,13 +58,17 @@ func (c *Client) GetAllDomains() ([]*Domain, error) {
 		return nil, err
 	}
 
-	if res.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("%s: %s", ErrorDomainGet, res.Status)
-	}
-
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode/100 != 2 {
+		re := &RequestError{}
+		if err := json.Unmarshal(b, re); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%s %s", ErrorDomainGet, re)
 	}
 
 	pr := &PagedResult{}
@@ -81,7 +88,7 @@ func (c *Client) GetAllDomains() ([]*Domain, error) {
 
 func (c *Client) AddDomain(domain *Domain) error {
 	if domain == nil {
-		return errors.New("Error adding nil domain")
+		return errors.New("go-mailman: Error adding nil domain")
 	}
 
 	b, err := json.Marshal(domain)
@@ -95,7 +102,16 @@ func (c *Client) AddDomain(domain *Domain) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		return fmt.Errorf("%s: %s", ErrorDomainAdd, res.Status)
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
+		re := &RequestError{}
+		if err := json.Unmarshal(b, re); err != nil {
+			return err
+		}
+		return fmt.Errorf("%s %s", ErrorDomainAdd, re)
 	}
 
 	return res.Body.Close()
@@ -108,7 +124,17 @@ func (c *Client) DeleteDomain(domainID string) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		return fmt.Errorf("%s: %s", ErrorDomainDelete, res.Status)
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
+		re := &RequestError{}
+		if err := json.Unmarshal(b, re); err != nil {
+			return err
+		}
+
+		return fmt.Errorf("%s %s", ErrorDomainDelete, re)
 	}
 
 	return res.Body.Close()
