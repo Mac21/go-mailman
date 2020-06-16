@@ -14,7 +14,7 @@ const (
 func TestClientAddDomain(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 
 	domain := &Domain{
@@ -24,19 +24,19 @@ func TestClientAddDomain(t *testing.T) {
 	}
 
 	if err := c.AddDomain(domain); err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 }
 
 func TestClientGetDomain(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 
 	domain, err := c.GetDomain(domainID)
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 
 	if domain.AliasDomain != domainAlias {
@@ -55,12 +55,12 @@ func TestClientGetDomain(t *testing.T) {
 func TestClientDeleteDomain(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 
 	err = c.DeleteDomain(domainID)
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 
 	domain, err := c.GetDomain(domainID)
@@ -73,5 +73,56 @@ func TestClientDeleteDomain(t *testing.T) {
 
 	if domain != nil {
 		t.Error("Got non nil domain after delete")
+	}
+}
+
+func TestClientGetAllDomains(t *testing.T) {
+	c, err := NewClient(baseURL, username, password)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	mailHostsLoaded := map[string]bool{
+		"swag@localhost.com":    false,
+		"swagout@localhost.com": false,
+		"swaggin@localhost.com": false,
+		"swang@localhost.com":   false,
+		"swig@localhost.com":    false,
+		"swiggin@localhost.com": false,
+		"swing@localhost.com":   false,
+		"sing@localhost.com":    false,
+		"swingin@localhost.com": false,
+		"swagit@localhost.com":  false,
+	}
+
+	placeHolder := &Domain{}
+	for host, _ := range mailHostsLoaded {
+		placeHolder.MailHost = host
+		err := c.AddDomain(placeHolder)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	domains, err := c.GetAllDomains()
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, d := range domains {
+		loaded, exists := mailHostsLoaded[d.MailHost]
+		if !exists {
+			t.Errorf("Unknown domain loaded: %s", d.MailHost)
+		}
+
+		if !loaded {
+			mailHostsLoaded[d.MailHost] = true
+		}
+	}
+
+	for host, loaded := range mailHostsLoaded {
+		if !loaded {
+			t.Errorf("Domain %s not loaded when expected", host)
+		}
 	}
 }
