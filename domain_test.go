@@ -66,13 +66,27 @@ func TestDeleteDomain(t *testing.T) {
 	domain, err := c.GetDomain(domainID)
 	if err != nil {
 		e := err.Error()
-		if !strings.Contains(e, ErrorDomainGet) {
+		if !strings.Contains(e, ErrorDomainGet.Error()) {
 			t.Error(e)
 		}
 	}
 
 	if domain != nil {
 		t.Error("Got non nil domain after delete")
+	}
+}
+
+func TestDeleteMissingDomain(t *testing.T) {
+	c, err := NewClient(baseURL, username, password)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = c.DeleteDomain("ldkjsf@localhost.com")
+	if err != nil {
+		if !strings.Contains(err.Error(), "404 Not Found") {
+			t.Error(err)
+		}
 	}
 }
 
