@@ -1,11 +1,7 @@
 package gomailman
 
-import (
-	"fmt"
-)
-
+// RequestError is a type that represents a request error returned by Mailman
 type RequestError struct {
-	error
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
@@ -13,9 +9,15 @@ type RequestError struct {
 var _ error = RequestError{}
 
 func (re RequestError) Error() string {
-	return fmt.Sprintf("%#v", re)
+	if re.Title != re.Description {
+		return re.Title + " " + re.Description
+	}
+	return re.Title
 }
 
 func (re RequestError) String() string {
-	return fmt.Sprintf("%#v", re)
+	if re.Title != re.Description {
+		return re.Title + " " + re.Description
+	}
+	return re.Title
 }
