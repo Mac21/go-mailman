@@ -11,7 +11,7 @@ const (
 	domainDescription = "Test Domain"
 )
 
-func TestClientAddDomain(t *testing.T) {
+func TestAddDomain(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestClientAddDomain(t *testing.T) {
 	}
 }
 
-func TestClientGetDomain(t *testing.T) {
+func TestGetDomain(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
 		t.Error(err)
@@ -52,7 +52,7 @@ func TestClientGetDomain(t *testing.T) {
 	}
 }
 
-func TestClientDeleteDomain(t *testing.T) {
+func TestDeleteDomain(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
 		t.Error(err)
@@ -76,7 +76,7 @@ func TestClientDeleteDomain(t *testing.T) {
 	}
 }
 
-func TestClientGetAllDomains(t *testing.T) {
+func TestGetAllDomains(t *testing.T) {
 	c, err := NewClient(baseURL, username, password)
 	if err != nil {
 		t.Error(err.Error())
