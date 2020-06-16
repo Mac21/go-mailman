@@ -21,6 +21,10 @@ type Domain struct {
 	MailHost    string `json:"mail_host"`
 }
 
+func (d Domain) String() string {
+	return fmt.Sprintf("%#v", d)
+}
+
 func (c *Client) GetDomain(domainID string) (*Domain, error) {
 	res, err := c.conn.do(http.MethodGet, c.buildURL("domains", domainID), http.NoBody)
 	if err != nil {
@@ -43,6 +47,36 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 	}
 
 	return domain, res.Body.Close()
+}
+
+func (c *Client) GetAllDomains() ([]*Domain, error) {
+	res, err := c.conn.do(http.MethodGet, c.buildURL("domains"), http.NoBody)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode/100 != 2 {
+		return nil, fmt.Errorf("%s: %s", ErrorDomainGet, res.Status)
+	}
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	pr := &PagedResult{}
+	err = json.Unmarshal(b, pr)
+	if err != nil {
+		return nil, err
+	}
+
+	domains := make([]*Domain, 0)
+	err = json.Unmarshal(pr.Entries, &domains)
+	if err != nil {
+		return nil, err
+	}
+
+	return domains, res.Body.Close()
 }
 
 func (c *Client) AddDomain(domain *Domain) error {
