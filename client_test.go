@@ -7,6 +7,6 @@ import (
 func TestClientInit(t *testing.T) {
 	_, err := NewClient(baseURL, username, password)
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 	}
 }
