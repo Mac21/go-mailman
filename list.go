@@ -3,18 +3,7 @@ package gomailman
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
-)
-
-var (
-	// ErrorListGet is an error returned by GetList when response status != 2XX
-	ErrorListGet = errors.New("go-mailman: Error getting list")
-	// ErrorListAdd is an error returned by AddList when response status != 2XX
-	ErrorListAdd = errors.New("go-mailman: Error adding list")
-	// ErrorListDelete is an error returned by DeleteList when response status != 2XX
-	ErrorListDelete = errors.New("go-mailman: Error deleting list")
 )
 
 type List struct {
@@ -30,19 +19,15 @@ type List struct {
 	SendWelcomeMessage bool   `json:"send_welcome_message"`
 }
 
+// GetList takes a list_id and returns a single list.
 func (c *Client) GetList(listID string) (*List, error) {
 	res, err := c.conn.do(http.MethodGet, buildURL("lists", listID), http.NoBody)
 	if err != nil {
 		return nil, err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("%s: %s", ErrorListGet, re)
+	if err := parseResponseError(res); err != nil {
+		return nil, err
 	}
 
 	list := new(List)
@@ -68,12 +53,8 @@ func (c *Client) AddList(listID string) error {
 		return err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return err
-		}
-		return fmt.Errorf("%s %s", ErrorListAdd, re)
+	if err := parseResponseError(res); err != nil {
+		return err
 	}
 
 	return res.Body.Close()
@@ -85,13 +66,8 @@ func (c *Client) DeleteList(listID string) error {
 		return err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return err
-		}
-
-		return fmt.Errorf("%s %s", ErrorListDelete, re)
+	if err := parseResponseError(res); err != nil {
+		return err
 	}
 
 	return res.Body.Close()

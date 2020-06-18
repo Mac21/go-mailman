@@ -4,17 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-)
-
-var (
-	// ErrorDomainGet is returned in GetDomain and GetAllDomains by any non 200 response
-	ErrorDomainGet = errors.New("go-mailman: Error getting domain")
-	// ErrorDomainDelete is returned by DeleteDomain by any non 200 respose
-	ErrorDomainDelete = errors.New("go-mailman: Error deleting domain")
-	// ErrorDomainAdd is returned by AddDomain when any non 200 respose
-	ErrorDomainAdd = errors.New("go-mailman: Error adding domain")
 )
 
 type Domain struct {
@@ -29,12 +19,8 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 		return nil, err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return nil, err
-		}
-		return nil, fmt.Errorf("%s %s", ErrorDomainGet, re)
+	if err := parseResponseError(res); err != nil {
+		return nil, err
 	}
 
 	domain := new(Domain)
@@ -51,12 +37,8 @@ func (c *Client) GetAllDomains() ([]*Domain, error) {
 		return nil, err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return nil, err
-		}
-		return nil, fmt.Errorf("%s %s", ErrorDomainGet, re)
+	if err := parseResponseError(res); err != nil {
+		return nil, err
 	}
 
 	pr := &PagedResult{}
@@ -87,12 +69,8 @@ func (c *Client) AddDomain(domain *Domain) error {
 		return err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return err
-		}
-		return fmt.Errorf("%s %s", ErrorDomainAdd, re)
+	if err := parseResponseError(res); err != nil {
+		return err
 	}
 
 	return res.Body.Close()
@@ -104,13 +82,8 @@ func (c *Client) DeleteDomain(domainID string) error {
 		return err
 	}
 
-	if res.StatusCode/100 != 2 {
-		re := &RequestError{}
-		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
-			return err
-		}
-
-		return fmt.Errorf("%s %s", ErrorDomainDelete, re)
+	if err := parseResponseError(res); err != nil {
+		return err
 	}
 
 	return res.Body.Close()
