@@ -7,7 +7,7 @@ import (
 
 const (
 	domainAlias       = "jimbo@localhost.com"
-	domainID          = "test@localhost.com"
+	domainID          = "localhost.com"
 	domainDescription = "Test Domain"
 )
 
@@ -97,20 +97,21 @@ func TestGetAllDomains(t *testing.T) {
 	}
 
 	mailHostsLoaded := map[string]bool{
-		"swag@localhost.com":    false,
-		"swagout@localhost.com": false,
-		"swaggin@localhost.com": false,
-		"swang@localhost.com":   false,
-		"swig@localhost.com":    false,
-		"swiggin@localhost.com": false,
-		"swing@localhost.com":   false,
-		"sing@localhost.com":    false,
-		"swingin@localhost.com": false,
-		"swagit@localhost.com":  false,
+		"swag.localhost.com":    false,
+		"swagout.localhost.com": false,
+		"swaggin.localhost.com": false,
+		"swang.localhost.com":   false,
+		"swig.localhost.com":    false,
+		"swiggin.localhost.com": false,
+		"swing.localhost.com":   false,
+		"sing.localhost.com":    false,
+		"swingin.localhost.com": false,
+		"swagit.localhost.com":  false,
 	}
 
 	placeHolder := &Domain{}
 	for host, _ := range mailHostsLoaded {
+		_ = c.DeleteDomain(host)
 		placeHolder.MailHost = host
 		err := c.AddDomain(placeHolder)
 		if err != nil {
