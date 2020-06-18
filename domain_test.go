@@ -66,7 +66,7 @@ func TestDeleteDomain(t *testing.T) {
 	domain, err := c.GetDomain(domainID)
 	if err != nil {
 		e := err.Error()
-		if !strings.Contains(e, ErrorDomainGet.Error()) {
+		if !strings.Contains(e, "404 Not Found") {
 			t.Error(e)
 		}
 	}
