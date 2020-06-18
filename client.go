@@ -1,5 +1,11 @@
 package gomailman
 
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
 type Client struct {
 	conn *Connection
 }
@@ -26,4 +32,17 @@ func buildURL(parts ...string) string {
 	}
 
 	return url
+}
+
+func parseResponseError(res *http.Response) error {
+	if res.StatusCode/100 != 2 {
+		re := RequestError{}
+		if err := json.NewDecoder(res.Body).Decode(&re); err != nil {
+			return fmt.Errorf("go-mailman: Error %d %s", res.StatusCode, err)
+		}
+
+		return re
+	}
+
+	return nil
 }
