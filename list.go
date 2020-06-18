@@ -60,6 +60,24 @@ func (c *Client) AddList(listID string) error {
 	return res.Body.Close()
 }
 
+func (c *Client) ModifyList(listID string, list *List) error {
+	b, err := json.Marshal(list)
+	if err != nil {
+		return err
+	}
+
+	res, err := c.conn.do(http.MethodPost, buildURL("lists"), bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+
+	if err := parseResponseError(res); err != nil {
+		return err
+	}
+
+	return res.Body.Close()
+}
+
 func (c *Client) DeleteList(listID string) error {
 	res, err := c.conn.do(http.MethodDelete, buildURL("lists", listID), http.NoBody)
 	if err != nil {
