@@ -25,6 +25,7 @@ func (c *Connection) do(method, url string, body io.Reader) (*http.Response, err
 	}
 
 	req.SetBasicAuth(c.username, c.password)
+	req.Close = true
 	return c.conn.Do(req)
 }
 
