@@ -4,7 +4,18 @@ type Client struct {
 	conn *Connection
 }
 
-func (c *Client) buildURL(parts ...string) string {
+func NewClient(host, username, password string) (*Client, error) {
+	conn, err := NewConnection(host, username, password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{
+		conn: conn,
+	}, nil
+}
+
+func buildURL(parts ...string) string {
 	var url string
 	for indx, p := range parts {
 		if indx == 0 {
@@ -15,15 +26,4 @@ func (c *Client) buildURL(parts ...string) string {
 	}
 
 	return url
-}
-
-func NewClient(host, username, password string) (*Client, error) {
-	conn, err := NewConnection(host, username, password)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Client{
-		conn: conn,
-	}, nil
 }

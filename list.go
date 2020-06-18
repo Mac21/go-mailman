@@ -31,7 +31,7 @@ type List struct {
 }
 
 func (c *Client) GetList(listID string) (*List, error) {
-	res, err := c.conn.do(http.MethodGet, c.buildURL("lists", listID), http.NoBody)
+	res, err := c.conn.do(http.MethodGet, buildURL("lists", listID), http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *Client) AddList(listID string) error {
 		return err
 	}
 
-	res, err := c.conn.do(http.MethodPost, c.buildURL("lists"), bytes.NewReader(b))
+	res, err := c.conn.do(http.MethodPost, buildURL("lists"), bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (c *Client) AddList(listID string) error {
 }
 
 func (c *Client) DeleteList(listID string) error {
-	res, err := c.conn.do(http.MethodDelete, c.buildURL("lists", listID), http.NoBody)
+	res, err := c.conn.do(http.MethodDelete, buildURL("lists", listID), http.NoBody)
 	if err != nil {
 		return err
 	}

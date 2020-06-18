@@ -24,7 +24,7 @@ type Domain struct {
 }
 
 func (c *Client) GetDomain(domainID string) (*Domain, error) {
-	res, err := c.conn.do(http.MethodGet, c.buildURL("domains", domainID), http.NoBody)
+	res, err := c.conn.do(http.MethodGet, buildURL("domains", domainID), http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 }
 
 func (c *Client) GetAllDomains() ([]*Domain, error) {
-	res, err := c.conn.do(http.MethodGet, c.buildURL("domains"), http.NoBody)
+	res, err := c.conn.do(http.MethodGet, buildURL("domains"), http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (c *Client) AddDomain(domain *Domain) error {
 		return err
 	}
 
-	res, err := c.conn.do(http.MethodPost, c.buildURL("domains"), bytes.NewReader(b))
+	res, err := c.conn.do(http.MethodPost, buildURL("domains"), bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *Client) AddDomain(domain *Domain) error {
 }
 
 func (c *Client) DeleteDomain(domainID string) error {
-	res, err := c.conn.do(http.MethodDelete, c.buildURL("domains", domainID), http.NoBody)
+	res, err := c.conn.do(http.MethodDelete, buildURL("domains", domainID), http.NoBody)
 	if err != nil {
 		return err
 	}
