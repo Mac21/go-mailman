@@ -15,12 +15,20 @@ var (
 	// ErrorListAdd is an error returned by AddList when response status != 2XX
 	ErrorListAdd = errors.New("go-mailman: Error adding list")
 	// ErrorListDelete is an error returned by DeleteList when response status != 2XX
-	ErrorListAdd = errors.New("go-mailman: Error deleting list")
+	ErrorListDelete = errors.New("go-mailman: Error deleting list")
 )
 
 type List struct {
-	Name string `json:"list_name"`
-	ID   string `json:"list_id"`
+	ID                 string `json:"list_id"`
+	Name               string `json:"list_name"`
+	MailHost           string `json:"mail_host"`
+	Description        string `json:"description"`
+	AllowListPosts     bool   `json:"allow_list_posts"`
+	Advertised         bool   `json:"advertised"`
+	AnonymousList      bool   `json:"anonymous_list"`
+	Administrivia      bool   `json:"administrivia"`
+	SendGoodbyeMessage bool   `json:"send_goodbye_message"`
+	SendWelcomeMessage bool   `json:"send_welcome_message"`
 }
 
 func (c *Client) GetList(listID string) (*List, error) {
@@ -52,12 +60,12 @@ func (c *Client) GetList(listID string) (*List, error) {
 	return list, res.Body.Close()
 }
 
-func (c *Client) AddList(list *List) error {
-	if list == nil {
-		return errors.New("go-mailman: Error adding nil list")
+func (c *Client) AddList(listID string) error {
+	fakeList := map[string]string{
+		"fqdn_listname": listID,
 	}
 
-	b, err := json.Marshal(list)
+	b, err := json.Marshal(fakeList)
 	if err != nil {
 		return err
 	}
