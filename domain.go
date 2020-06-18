@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -30,22 +29,16 @@ func (c *Client) GetDomain(domainID string) (*Domain, error) {
 		return nil, err
 	}
 
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	if res.StatusCode/100 != 2 {
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return nil, err
 		}
 		return nil, fmt.Errorf("%s %s", ErrorDomainGet, re)
 	}
 
 	domain := new(Domain)
-	err = json.Unmarshal(b, domain)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(domain); err != nil {
 		return nil, err
 	}
 
@@ -58,28 +51,21 @@ func (c *Client) GetAllDomains() ([]*Domain, error) {
 		return nil, err
 	}
 
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	if res.StatusCode/100 != 2 {
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return nil, err
 		}
 		return nil, fmt.Errorf("%s %s", ErrorDomainGet, re)
 	}
 
 	pr := &PagedResult{}
-	err = json.Unmarshal(b, pr)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(pr); err != nil {
 		return nil, err
 	}
 
 	domains := make([]*Domain, 0)
-	err = json.Unmarshal(pr.Entries, &domains)
-	if err != nil {
+	if err = json.Unmarshal(pr.Entries, &domains); err != nil {
 		return nil, err
 	}
 
@@ -102,13 +88,8 @@ func (c *Client) AddDomain(domain *Domain) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return err
 		}
 		return fmt.Errorf("%s %s", ErrorDomainAdd, re)
@@ -124,13 +105,8 @@ func (c *Client) DeleteDomain(domainID string) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return err
 		}
 

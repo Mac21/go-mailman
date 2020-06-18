@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -37,14 +36,9 @@ func (c *Client) GetList(listID string) (*List, error) {
 		return nil, err
 	}
 
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	if res.StatusCode/100 != 2 {
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return nil, err
 		}
 
@@ -52,8 +46,7 @@ func (c *Client) GetList(listID string) (*List, error) {
 	}
 
 	list := new(List)
-	err = json.Unmarshal(b, list)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(list); err != nil {
 		return nil, err
 	}
 
@@ -76,13 +69,8 @@ func (c *Client) AddList(listID string) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return err
 		}
 		return fmt.Errorf("%s %s", ErrorListAdd, re)
@@ -98,13 +86,8 @@ func (c *Client) DeleteList(listID string) error {
 	}
 
 	if res.StatusCode/100 != 2 {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
 		re := &RequestError{}
-		if err := json.Unmarshal(b, re); err != nil {
+		if err := json.NewDecoder(res.Body).Decode(re); err != nil {
 			return err
 		}
 
