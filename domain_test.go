@@ -109,6 +109,12 @@ func TestGetAllDomains(t *testing.T) {
 		"swagit.localhost.com":  false,
 	}
 
+	t.Cleanup(func() {
+		for host, _ := range mailHostsLoaded {
+			_ = c.DeleteDomain(host)
+		}
+	})
+
 	placeHolder := &Domain{}
 	for host, _ := range mailHostsLoaded {
 		_ = c.DeleteDomain(host)
