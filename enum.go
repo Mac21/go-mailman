@@ -26,10 +26,10 @@ const (
 type MemberRole int
 
 const (
-	Member MemberRole = iota + 1
-	Owner
-	Moderator
-	NonMember
+	RoleMember MemberRole = iota + 1
+	RoleOwner
+	RoleModerator
+	RoleNonMember
 )
 
 type DeliveryMode int
