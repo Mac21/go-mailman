@@ -4,12 +4,12 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strings"
+	"net/url"
 )
 
 type Connection struct {
 	conn     http.Client
-	baseURL  string
+	url      *url.URL
 	username string
 	password string
 }
@@ -30,8 +30,9 @@ func (c *Connection) do(method, url string, body io.Reader) (*http.Response, err
 }
 
 func NewConnection(baseURL, username, password string) (*Connection, error) {
-	if !strings.HasSuffix(baseURL, "/") {
-		baseURL += "/"
+	url, err := url.Parse(baseURL)
+	if err != nil {
+		return nil, err
 	}
 
 	if username == "" || password == "" {
