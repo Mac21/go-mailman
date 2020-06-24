@@ -10,6 +10,7 @@ import (
 type Connection struct {
 	conn     http.Client
 	url      *url.URL
+	baseURL  string
 	username string
 	password string
 }
