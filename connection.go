@@ -30,7 +30,7 @@ func (c *Connection) do(method, url string, body io.Reader) (*http.Response, err
 }
 
 func NewConnection(baseURL, username, password string) (*Connection, error) {
-	url, err := url.Parse(baseURL)
+	_, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
