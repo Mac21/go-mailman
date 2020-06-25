@@ -77,3 +77,32 @@ func (c *Client) GetListMembers(listID string) ([]*Member, error) {
 
 	return members, res.Body.Close()
 }
+
+type RemovedMembers map[string]bool
+
+func (c *Client) DeleteListMembers(listID string, emails []string) (RemovedMembers, error) {
+	params := map[string][]string{
+		"emails": emails,
+	}
+
+	b, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.conn.do(http.MethodGet, buildURL("lists", listID, "roster", "member"), bytes.NewBuffer(b))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := parseResponseError(res); err != nil {
+		return nil, err
+	}
+
+	removedMembers := make(RemovedMembers)
+	if err = json.NewDecoder(res.Body).Decode(&removedMembers); err != nil {
+		return nil, err
+	}
+
+	return removedMembers, nil
+}
