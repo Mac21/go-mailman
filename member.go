@@ -88,7 +88,7 @@ func (c *Client) DeleteListMember(listID, email string) error {
 		return err
 	}
 
-	return nil
+	return res.Body.Close()
 }
 
 type RemovedMembers map[string]bool
@@ -117,5 +117,5 @@ func (c *Client) DeleteListMembers(listID string, emails []string) (RemovedMembe
 		return nil, err
 	}
 
-	return removedMembers, nil
+	return removedMembers, res.Body.Close()
 }
