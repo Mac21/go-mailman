@@ -90,7 +90,7 @@ func (c *Client) DeleteListMembers(listID string, emails []string) (RemovedMembe
 		return nil, err
 	}
 
-	res, err := c.conn.do(http.MethodGet, buildURL("lists", listID, "roster", "member"), bytes.NewBuffer(b))
+	res, err := c.conn.do(http.MethodDelete, buildURL("lists", listID, "roster", "member"), bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}
