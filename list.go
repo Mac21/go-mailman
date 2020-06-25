@@ -33,6 +33,8 @@ type List struct {
 	MemberCount  int    `json:"member_count"`
 }
 
+type PartialListConfig map[string]interface{}
+
 type ListConfig struct {
 	AcceptableAliases        []string             `json:"acceptable_aliases"`
 	AcceptTheseNonMembers    []string             `json:"accept_these_non_members"`
@@ -149,6 +151,7 @@ func (c *Client) GetList(listID string) (*List, error) {
 	return list, res.Body.Close()
 }
 
+// AddList creates a list with default style, settings, and no members
 func (c *Client) AddList(listID string) error {
 	fakeList := map[string]string{
 		"fqdn_listname": listID,
@@ -171,13 +174,14 @@ func (c *Client) AddList(listID string) error {
 	return res.Body.Close()
 }
 
-func (c *Client) UpdateListConfig(listID string, lc *ListConfig) error {
+// SetListConfig sets the entire list config, so if any required attributes are missing an error is returned
+func (c *Client) SetListConfig(listID string, lc *ListConfig) error {
 	b, err := json.Marshal(lc)
 	if err != nil {
 		return err
 	}
 
-	res, err := c.conn.do(http.MethodPost, buildURL("lists", listID, "config"), bytes.NewReader(b))
+	res, err := c.conn.do(http.MethodPut, buildURL("lists", listID, "config"), bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
@@ -189,6 +193,26 @@ func (c *Client) UpdateListConfig(listID string, lc *ListConfig) error {
 	return res.Body.Close()
 }
 
+// UpdateListConfig patches a list's config, so at least 1 attribute is required versus all of them
+func (c *Client) UpdateListConfig(listID string, plc PartialListConfig) error {
+	b, err := json.Marshal(plc)
+	if err != nil {
+		return err
+	}
+
+	res, err := c.conn.do(http.MethodPatch, buildURL("lists", listID, "config"), bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+
+	if err := parseResponseError(res); err != nil {
+		return err
+	}
+
+	return res.Body.Close()
+}
+
+// DeleteList deletes a list and unsubscribes all members
 func (c *Client) DeleteList(listID string) error {
 	res, err := c.conn.do(http.MethodDelete, buildURL("lists", listID), http.NoBody)
 	if err != nil {
