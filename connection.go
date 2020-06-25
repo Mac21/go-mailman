@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type Connection struct {
@@ -33,6 +34,10 @@ func NewConnection(baseURL, username, password string) (*Connection, error) {
 	_, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
+	}
+
+	if !strings.HasSuffix(baseURL, "/") {
+		baseURL += "/"
 	}
 
 	if username == "" || password == "" {
