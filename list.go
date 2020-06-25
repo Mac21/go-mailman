@@ -193,9 +193,10 @@ func (c *Client) SetListConfig(listID string, lc *ListConfig) error {
 	return res.Body.Close()
 }
 
-// UpdateListConfig patches a list's config, so at least 1 attribute is required versus all of them
+// UpdateListConfig patches a list's config, so at least 1 attribute is required versus all of them.
+// Note when changing boolean fields they do need to be quoted.
 func (c *Client) UpdateListConfig(listID string, plc PartialListConfig) error {
-	b, err := json.Marshal(plc)
+	b, err := json.Marshal(&plc)
 	if err != nil {
 		return err
 	}
