@@ -78,6 +78,19 @@ func (c *Client) GetListMembers(listID string) ([]*Member, error) {
 	return members, res.Body.Close()
 }
 
+func (c *Client) DeleteListMember(listID, email string) error {
+	res, err := c.conn.do(http.MethodDelete, buildURL("lists", listID, "members", email), http.NoBody)
+	if err != nil {
+		return err
+	}
+
+	if err := parseResponseError(res); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type RemovedMembers map[string]bool
 
 func (c *Client) DeleteListMembers(listID string, emails []string) (RemovedMembers, error) {
