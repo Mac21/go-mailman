@@ -39,7 +39,7 @@ func TestGetList(t *testing.T) {
 
 	list, err := c.GetList(listID)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	if list.MailHost != domainID {

@@ -36,7 +36,7 @@ func TestGetDomain(t *testing.T) {
 
 	domain, err := c.GetDomain(domainID)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	if domain.AliasDomain != domainAlias {
